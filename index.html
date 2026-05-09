@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IUB Hostel Management System</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ============================================================
+     LANDING PAGE — shown first; user picks Student or Office
+     ============================================================ -->
+<div id="landingPage" class="landing-wrapper">
+  <!-- Animated background blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="landing-card">
+    <!-- IUB Logo / Brand -->
+    <div class="brand-block text-center mb-4">
+      <div class="iub-logo">
+        <span class="logo-i">I</span><span class="logo-u">U</span><span class="logo-b">B</span>
+      </div>
+      <h1 class="brand-title">The Islamia University of Bahawalpur</h1>
+      <p class="brand-sub">Hostel Management System</p>
+      <div class="brand-divider"></div>
+    </div>
+
+    <p class="choose-label">Please select your portal to continue</p>
+
+    <div class="portal-options">
+      <!-- Student Portal Button -->
+      <button class="portal-btn student-btn" onclick="showStudentPortal()">
+        <div class="portal-icon"><i class="bi bi-mortarboard-fill"></i></div>
+        <div class="portal-text">
+          <span class="portal-role">Student</span>
+          <span class="portal-desc">Apply, track & manage your room</span>
+        </div>
+        <i class="bi bi-arrow-right portal-arrow"></i>
+      </button>
+
+      <!-- Office/Admin Button -->
+      <button class="portal-btn office-btn" onclick="showLoginModal()">
+        <div class="portal-icon"><i class="bi bi-building-fill-gear"></i></div>
+        <div class="portal-text">
+          <span class="portal-role">Office / Admin</span>
+          <span class="portal-desc">Manage bookings, rooms & students</span>
+        </div>
+        <i class="bi bi-arrow-right portal-arrow"></i>
+      </button>
+    </div>
+
+    <p class="landing-footer">© 2024 IUB Hostel Management — All rights reserved</p>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     ADMIN LOGIN MODAL
+     ============================================================ -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content login-modal-content">
+      <div class="modal-body p-0">
+        <div class="login-header text-center">
+          <div class="iub-logo small mb-2">
+            <span class="logo-i">I</span><span class="logo-u">U</span><span class="logo-b">B</span>
+          </div>
+          <h5 class="login-title">Admin Login</h5>
+          <p class="login-sub">Office staff only</p>
+        </div>
+        <div class="login-body">
+          <div id="loginError" class="alert alert-danger d-none" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Invalid credentials. Try again.
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Admin ID</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+              <input type="text" class="form-control" id="adminId" placeholder="Enter Admin ID"/>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+              <input type="password" class="form-control" id="adminPassword" placeholder="Enter Password"/>
+              <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                <i class="bi bi-eye" id="eyeIcon"></i>
+              </button>
+            </div>
+            <small class="text-muted">Demo — ID: <strong>admin</strong> | Pass: <strong>iub2024</strong></small>
+          </div>
+          <button class="btn btn-login w-100" onclick="handleAdminLogin()">
+            <i class="bi bi-shield-lock-fill me-2"></i>Login to Dashboard
+          </button>
+          <button class="btn btn-link w-100 mt-2 back-link" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left me-1"></i>Back to Home
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     ADMIN DASHBOARD — hidden until admin logs in
+     ============================================================ -->
+<div id="adminDashboard" class="d-none">
+
+  <!-- Admin Top Navbar -->
+  <nav class="navbar admin-navbar px-3 px-md-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="iub-logo nano"><span class="logo-i">I</span><span class="logo-u">U</span><span class="logo-b">B</span></div>
+      <div>
+        <span class="nav-brand-title">IUB Hostel</span>
+        <span class="nav-brand-badge ms-2">Admin</span>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <span class="navbar-text d-none d-md-inline">
+        <i class="bi bi-person-circle me-1"></i>Administrator
+      </span>
+      <button class="btn btn-nav-logout" onclick="logoutAdmin()">
+        <i class="bi bi-box-arrow-right me-1"></i>Logout
+      </button>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar">
+      <ul class="sidebar-nav">
+        <li>
+          <button class="sidebar-item active" onclick="showAdminSection('stats')" id="sideStats">
+            <i class="bi bi-bar-chart-fill"></i><span>Dashboard</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showAdminSection('bookings')" id="sideBookings">
+            <i class="bi bi-journal-bookmark-fill"></i><span>Bookings</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showAdminSection('rooms')" id="sideRooms">
+            <i class="bi bi-door-open-fill"></i><span>Rooms</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showAdminSection('complaints')" id="sideComplaints">
+            <i class="bi bi-megaphone-fill"></i><span>Complaints</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showAdminSection('addStudent')" id="sideAddStudent">
+            <i class="bi bi-person-plus-fill"></i><span>Add Student</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Admin Main Content -->
+    <main class="admin-main">
+
+      <!-- SECTION: Stats / Dashboard -->
+      <section id="adminStats" class="admin-section">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-bar-chart-fill me-2"></i>Dashboard Overview</h2>
+          <span class="section-date" id="currentDate"></span>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="stat-card stat-blue">
+              <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+              <div class="stat-number" id="statTotalStudents">0</div>
+              <div class="stat-label">Total Students</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-card stat-green">
+              <div class="stat-icon"><i class="bi bi-door-closed-fill"></i></div>
+              <div class="stat-number" id="statAvailableRooms">0</div>
+              <div class="stat-label">Available Rooms</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-card stat-orange">
+              <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+              <div class="stat-number" id="statPending">0</div>
+              <div class="stat-label">Pending Requests</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="stat-card stat-red">
+              <div class="stat-icon"><i class="bi bi-chat-square-dots-fill"></i></div>
+              <div class="stat-number" id="statComplaints">0</div>
+              <div class="stat-label">Open Complaints</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Table -->
+        <div class="content-card">
+          <h5 class="card-section-title"><i class="bi bi-clock-history me-2"></i>Recent Applications</h5>
+          <div class="table-responsive">
+            <table class="table iub-table" id="recentTable">
+              <thead>
+                <tr><th>Student</th><th>Room Type</th><th>Applied</th><th>Status</th></tr>
+              </thead>
+              <tbody id="recentTableBody">
+                <tr><td colspan="4" class="text-center text-muted py-4">No applications yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: All Bookings / Management Panel -->
+      <section id="adminBookings" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-journal-bookmark-fill me-2"></i>Management Panel</h2>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="content-card mb-4">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-5">
+              <label class="form-label fw-semibold">Search Student</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" id="searchBooking" placeholder="Name or Roll No..." oninput="renderBookingsTable()"/>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Filter by Status</label>
+              <select class="form-select" id="filterStatus" onchange="renderBookingsTable()">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-iub w-100" onclick="exportCSV()">
+                <i class="bi bi-download me-2"></i>Export CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="table-responsive">
+            <table class="table iub-table" id="bookingsTable">
+              <thead>
+                <tr>
+                  <th>#</th><th>Name</th><th>Roll No</th><th>Room Type</th>
+                  <th>Applied</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookingsTableBody">
+                <tr><td colspan="7" class="text-center text-muted py-4">No bookings found</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: Rooms -->
+      <section id="adminRooms" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-door-open-fill me-2"></i>Room Inventory</h2>
+          <button class="btn btn-iub btn-sm" onclick="resetRooms()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Reset Rooms
+          </button>
+        </div>
+        <div class="row g-3" id="roomGrid">
+          <!-- Rooms are generated by JS -->
+        </div>
+      </section>
+
+      <!-- SECTION: Complaints -->
+      <section id="adminComplaints" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-megaphone-fill me-2"></i>Student Complaints</h2>
+        </div>
+        <div class="content-card">
+          <div class="table-responsive">
+            <table class="table iub-table">
+              <thead>
+                <tr><th>#</th><th>Student</th><th>Subject</th><th>Date</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="complaintsTableBody">
+                <tr><td colspan="6" class="text-center text-muted py-4">No complaints submitted</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: Add Student -->
+      <section id="adminAddStudent" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-person-plus-fill me-2"></i>Manually Add Student Booking</h2>
+        </div>
+        <div class="content-card" style="max-width:600px;">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Full Name *</label>
+              <input type="text" class="form-control" id="aName" placeholder="Student name"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Roll Number *</label>
+              <input type="text" class="form-control" id="aRoll" placeholder="e.g. IUB-2024-001"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Department</label>
+              <input type="text" class="form-control" id="aDept" placeholder="e.g. CS, IT"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Room Type</label>
+              <select class="form-select" id="aRoomType">
+                <option>Single</option>
+                <option>Double</option>
+                <option>Triple</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Contact</label>
+              <input type="text" class="form-control" id="aContact" placeholder="Phone number"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Status</label>
+              <select class="form-select" id="aStatus">
+                <option>Pending</option>
+                <option>Approved</option>
+                <option>Rejected</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-iub px-5" onclick="adminAddStudent()">
+                <i class="bi bi-plus-circle-fill me-2"></i>Add Booking
+              </button>
+            </div>
+          </div>
+          <div id="addStudentMsg" class="mt-3"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div><!-- /adminDashboard -->
+
+
+<!-- ============================================================
+     STUDENT PORTAL — shown when student clicks their button
+     ============================================================ -->
+<div id="studentPortal" class="d-none">
+
+  <!-- Student Navbar -->
+  <nav class="navbar student-navbar px-3 px-md-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="iub-logo nano"><span class="logo-i">I</span><span class="logo-u">U</span><span class="logo-b">B</span></div>
+      <div>
+        <span class="nav-brand-title">IUB Hostel</span>
+        <span class="nav-brand-badge student ms-2">Student</span>
+      </div>
+    </div>
+    <button class="btn btn-nav-logout" onclick="backToLanding()">
+      <i class="bi bi-house-fill me-1"></i>Home
+    </button>
+  </nav>
+
+  <div class="student-layout">
+
+    <!-- Student Sidebar -->
+    <aside class="admin-sidebar student-sidebar">
+      <div class="sidebar-student-info" id="sidebarStudentInfo">
+        <div class="sidebar-avatar"><i class="bi bi-person-circle"></i></div>
+        <div class="sidebar-student-name" id="sidebarStudentName">Guest</div>
+        <div class="sidebar-student-id" id="sidebarStudentId">—</div>
+      </div>
+      <ul class="sidebar-nav">
+        <li>
+          <button class="sidebar-item active" onclick="showStudentSection('sRegister')" id="sideRegister">
+            <i class="bi bi-person-plus-fill"></i><span>Register</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showStudentSection('sApply')" id="sideApply">
+            <i class="bi bi-send-fill"></i><span>Apply for Room</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showStudentSection('sStatus')" id="sideStatus">
+            <i class="bi bi-search-heart-fill"></i><span>Track Status</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-item" onclick="showStudentSection('sComplain')" id="sideComplain">
+            <i class="bi bi-chat-left-dots-fill"></i><span>Complaint</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Student Main Content -->
+    <main class="admin-main">
+
+      <!-- SECTION: Register -->
+      <section id="sRegister" class="admin-section">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-person-plus-fill me-2"></i>Student Registration</h2>
+        </div>
+        <div class="content-card" style="max-width:580px;">
+          <p class="text-muted mb-4">Register your profile to access all hostel services.</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Full Name *</label>
+              <input type="text" class="form-control" id="sRegName" placeholder="Your full name"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Roll Number *</label>
+              <input type="text" class="form-control" id="sRegRoll" placeholder="e.g. IUB-2024-123"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Department *</label>
+              <select class="form-select" id="sRegDept">
+                <option value="">Select Department</option>
+                <option>Computer Science</option>
+                <option>Information Technology</option>
+                <option>Electrical Engineering</option>
+                <option>Business Administration</option>
+                <option>Islamic Studies</option>
+                <option>Physics</option>
+                <option>Mathematics</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Semester</label>
+              <select class="form-select" id="sRegSem">
+                <option>1st</option><option>2nd</option><option>3rd</option><option>4th</option>
+                <option>5th</option><option>6th</option><option>7th</option><option>8th</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">CNIC</label>
+              <input type="text" class="form-control" id="sRegCnic" placeholder="xxxxx-xxxxxxx-x"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Contact Number *</label>
+              <input type="text" class="form-control" id="sRegContact" placeholder="03xx-xxxxxxx"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Guardian Name</label>
+              <input type="text" class="form-control" id="sRegGuardian" placeholder="Parent/Guardian name"/>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-student-primary px-5" onclick="registerStudent()">
+                <i class="bi bi-check2-circle me-2"></i>Register Now
+              </button>
+            </div>
+          </div>
+          <div id="registerMsg" class="mt-3"></div>
+        </div>
+      </section>
+
+      <!-- SECTION: Apply for Room -->
+      <section id="sApply" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-send-fill me-2"></i>Apply for Room</h2>
+        </div>
+        <div class="content-card" style="max-width:580px;">
+          <p class="text-muted mb-4">Fill in the form below to apply for hostel accommodation.</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Your Roll Number *</label>
+              <input type="text" class="form-control" id="applyRoll" placeholder="Must be registered"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Room Type *</label>
+              <select class="form-select" id="applyRoomType">
+                <option>Single</option>
+                <option>Double</option>
+                <option>Triple</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Preferred Block</label>
+              <select class="form-select" id="applyBlock">
+                <option>Block A</option>
+                <option>Block B</option>
+                <option>Block C</option>
+                <option>No Preference</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Check-in Date</label>
+              <input type="date" class="form-control" id="applyDate"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Special Requirements</label>
+              <textarea class="form-control" id="applyNote" rows="3" placeholder="Any special needs or notes..."></textarea>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-student-primary px-5" onclick="applyForRoom()">
+                <i class="bi bi-send-fill me-2"></i>Submit Application
+              </button>
+            </div>
+          </div>
+          <div id="applyMsg" class="mt-3"></div>
+        </div>
+      </section>
+
+      <!-- SECTION: Track Status -->
+      <section id="sStatus" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-search-heart-fill me-2"></i>Check / Track Application</h2>
+        </div>
+        <div class="content-card" style="max-width:520px;">
+          <label class="form-label fw-semibold">Enter Your Roll Number</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="statusRoll" placeholder="e.g. IUB-2024-123"/>
+            <button class="btn btn-student-primary" onclick="checkStatus()">Track</button>
+          </div>
+          <div id="statusResult"></div>
+        </div>
+      </section>
+
+      <!-- SECTION: Complain -->
+      <section id="sComplain" class="admin-section d-none">
+        <div class="section-header">
+          <h2 class="section-title"><i class="bi bi-chat-left-dots-fill me-2"></i>Submit a Complaint</h2>
+        </div>
+        <div class="content-card" style="max-width:580px;">
+          <p class="text-muted mb-4">We take every complaint seriously. Please provide details below.</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Roll Number *</label>
+              <input type="text" class="form-control" id="compRoll" placeholder="Your roll number"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Category *</label>
+              <select class="form-select" id="compCategory">
+                <option>Water / Electricity</option>
+                <option>Room Maintenance</option>
+                <option>Food Quality</option>
+                <option>Security Issue</option>
+                <option>Staff Behaviour</option>
+                <option>Internet / WiFi</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Subject *</label>
+              <input type="text" class="form-control" id="compSubject" placeholder="Brief subject of complaint"/>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Description *</label>
+              <textarea class="form-control" id="compDesc" rows="4" placeholder="Describe your complaint in detail..."></textarea>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-student-primary px-5" onclick="submitComplaint()">
+                <i class="bi bi-send-fill me-2"></i>Submit Complaint
+              </button>
+            </div>
+          </div>
+          <div id="complainMsg" class="mt-3"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div><!-- /studentPortal -->
+
+
+<!-- ============================================================
+     TOAST NOTIFICATION
+     ============================================================ -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <span class="toast-icon me-2"><i class="bi bi-info-circle-fill" id="toastIcon"></i></span>
+      <strong class="me-auto" id="toastTitle">Notification</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toastBody"></div>
+  </div>
+</div>
+
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="script.js"></script>
+</body>
+</html>
